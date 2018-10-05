@@ -1,7 +1,5 @@
-import java.io.BufferedReader
-import java.io.InputStreamReader
+import org.jetbrains.annotations.Mutable
 
 fun main(args: Array<String>) {
 
-    println(15 % 1)
 }

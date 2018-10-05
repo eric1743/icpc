@@ -1,79 +1,73 @@
 package baylorcompetitivelearningcourse
 
-import java.io.BufferedReader
 import java.io.DataInputStream
-import java.io.InputStreamReader
-import java.util.*
 
 fun main(args: Array<String>) {
-//    val br = BufferedReader(InputStreamReader(System.`in`))
     val reader = Reader2()
     while (true) {
-//        val raw = br.readLine()
-//        if (raw.isNullOrBlank()) break
-//        val line = raw.split(" ").map { it.toInt() }
-        val r = Rand(reader.nextInt())
+        val seed = reader.nextInt()
+        if (!reader.hasNext) return
+        val r = Rand(seed)
         val n = reader.nextInt()
-        val map = MutableList(10000) { -1 }
-        val trees = mutableListOf<Int>()
+        val uMap = MutableList(10000) { -1 }
+        val planted = mutableListOf<Int>()
         var out = 0
         repeat(n) {
-            if (it != 0 && it % 100 == 0){
-                print(out.toString() + " ")
+            if (it != 0 && it % 100 == 0) {
+                print("$out ")
                 out = 0
             }
-            var m: Int
-            while (true) {
-                m = r.next() % 10000
-                if (map[m] == -1) break
-            }
-            trees.add(m)
-            map[m] = m
-            map.joinAdj(m)
-            val A = r.next() % (it + 1)
-            val B = r.next() % (it + 1)
-            if (map.find(trees[A]) == map.find(trees[B])) out++
+            while (uMap[r.incMod(10000)] != -1) { }
+            val tree = r(10000)
+            planted += tree
+            uMap[tree] = tree
+            uMap.joinAdj(r(10000))
+            val A = r.incMod(it + 1)
+            val B = r.incMod(it + 1)
+            if (uMap(planted[A]) == uMap(planted[B])) out++
         }
-        println()
+        println(out)
     }
 }
 
-fun MutableList<Int>.find(child: Int): Int {
+operator fun MutableList<Int>.invoke(child: Int): Int {  //find parent
     val parent = this[child]
     if (parent == child) return child
-    this[child] = this.find(parent)
+    this[child] = this(parent)
     return this[child]
 }
 
 fun MutableList<Int>.joinAdj(tree: Int) {
-    if (tree % 100 != 0 && this[tree - 1] != -1)
-        this[this.find(tree - 1)] = tree
-    if (tree % 100 != 99 && this[tree + 1] != -1)
-        this[this.find(tree + 1)] = tree
-    if (tree / 100 != 0 && this[tree - 100] != -1)
-        this[this.find(tree - 100)] = tree
-    if (tree / 100 != 99 && this[tree + 100] != -1)
-        this[this.find(tree + 100)] = tree
+    if (tree % 100 != 0 && this[tree - 1] != -1) //check if on left
+        this[this(tree - 1)] = tree
+    if (tree % 100 != 99 && this[tree + 1] != -1) //check if on right
+        this[this(tree + 1)] = tree
+    if (tree / 100 != 0 && this[tree - 100] != -1) //check if on bottom
+        this[this(tree - 100)] = tree
+    if (tree / 100 != 99 && this[tree + 100] != -1) //check if on top
+        this[this(tree + 100)] = tree
 }
 
 class Rand(var seed: Int) {
-    fun next(): Int {
-        seed = (seed * 5171 + 13297) % 50021
-        return seed
-    }
+//    operator fun inc() = Rand((seed * 5171 + 13297) % 50021)
+    fun inc() = this.apply { seed =  (seed * 5171 + 13297) % 50021}
+    fun incMod(mod: Int) = this.inc()(mod)
+    operator fun invoke(mod: Int) = seed % mod
 }
 
-private class Reader2(){
+private class Reader2() {
     val buffSize = 1.shl(16)
     val din = DataInputStream(System.`in`)
     var buffer = ByteArray(buffSize)
     var bufferPointer = 0
     var bytesRead = 0
+    var hasNext = true
 
     fun read(): Byte {
         if (bufferPointer == bytesRead) {
             bufferPointer = 0
             bytesRead = din.read(buffer, bufferPointer, buffSize)
+            if (bytesRead == -1) hasNext = false
         }
         return buffer[bufferPointer++]
     }
