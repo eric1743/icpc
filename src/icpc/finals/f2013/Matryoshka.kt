@@ -1,4 +1,4 @@
-package icpc.f2013
+package icpc.finals.f2013
 
 import java.io.BufferedReader
 import java.io.InputStreamReader

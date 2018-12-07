@@ -1,4 +1,4 @@
-package icpc.f2018
+package icpc.finals.f2018
 
 import java.io.BufferedReader
 import java.io.BufferedWriter

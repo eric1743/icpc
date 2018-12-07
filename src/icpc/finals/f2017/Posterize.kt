@@ -1,4 +1,4 @@
-package icpc.f2017
+package icpc.finals.f2017
 
 import java.io.BufferedReader
 import java.io.InputStreamReader
