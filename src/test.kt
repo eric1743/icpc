@@ -3,14 +3,11 @@ import java.util.*
 
 
 fun main(args: Array<String>) {
-    val joe = mutableListOf('a', 'b', 'c', 'a')
-    println(joe)
-    joe.remove('a')
-    println(joe)
-    joe.remove('a')
-    println(joe)
-    joe.remove('a')
-    println(joe)
+    val j = BigInteger("255")
+    val b = (1000 shr 32).toByte()
+    val i = j.toByteArray()
+    val k = BigInteger(i)
+    println(i)
 }
 
 
