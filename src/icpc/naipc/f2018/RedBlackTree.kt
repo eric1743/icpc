@@ -1,7 +1,6 @@
-package naipc.f2018
+package icpc.naipc.f2018
 
 import java.io.*
-import java.util.*
 
 fun main(args: Array<String>) {
 //    val br = File("/Users/z00327d/src/tools/icpc/src/naipc/f2018/sample/redblack-0002.in").bufferedReader()

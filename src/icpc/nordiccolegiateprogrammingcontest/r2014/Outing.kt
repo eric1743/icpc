@@ -11,7 +11,7 @@ fun main(args: Array<String>) {
     val loopSize = mutableListOf<Int>()
     val loopLegs = mutableListOf<Int>()
     var loopIdx = 0
-    loop@ for ((passenger, friend) in passengers.withIndex()) {
+    for ((passenger, friend) in passengers.withIndex()) {
         if (loopId[passenger] != -1) continue
         val buff = mutableListOf(passenger) //passengers in this loop network not yet assigned
         val timestamps = MutableList(n) { -1 } //timestamps to help determine loop size

@@ -13,11 +13,12 @@ fun main(args: Array<String>) {
         val p = line[1].toInt()
         if (p > minCost) continue
         val c = line[2].toInt()
-        val t = line[3].toInt()
+        val t = line[3].toLong() //avoid Int overflow
         val r = line[4].toInt()
-        val perCharge = c * t
-        val cycles = if (l % perCharge == 0) l / perCharge else l / perCharge + 1
-        if (cycles * (t + r) > 10080) continue
+//        val perCharge = c * t * 1.0 / l
+//        val perWeek = ( t + r ) / 10080.0
+//        if (perCharge < perWeek) continue
+        if ( c * t * 10080 - l * (t + r) < 0) continue
         if (p < minCost) {
             out = mutableListOf(line[0])
             minCost = p

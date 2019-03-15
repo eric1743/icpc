@@ -1,4 +1,4 @@
-package naipc.f2018
+package icpc.naipc.f2018
 
 import java.io.BufferedReader
 import java.io.BufferedWriter
