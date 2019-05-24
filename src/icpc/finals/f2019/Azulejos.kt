@@ -14,8 +14,15 @@ fun main() {
     val fOut = BufferedWriter(OutputStreamWriter(System.out), 4000000)
     repeat(n) {
 
-        val (bTile, fTile) = matchTiles(backTree, frntTree)
-
+        val bTile: Tile?
+        val fTile: Tile?
+        if (backTree.checkSize() < frntTree.checkSize()) {
+            bTile = backTree.poll()
+            fTile = frntTree.poll(bTile)
+        } else {
+            fTile = frntTree.poll()
+            bTile = backTree.poll(fTile)
+        }
         if (bTile == null || fTile == null) {
             println("impossible")
             return
@@ -28,15 +35,6 @@ fun main() {
     bOut.flush()
     println()
     fOut.flush()
-}
-
-fun matchTiles(bTree: Tree, fTree: Tree): Pair<Tile?, Tile?> {
-    if (bTree.checkSize() < fTree.checkSize()) {
-        val tile = bTree.poll()
-        return Pair(tile, fTree.poll(tile))
-    }
-    val tile = fTree.poll()
-    return Pair(bTree.poll(tile), tile)
 }
 
 class Tree(br: BufferedReader, n: Int, isFront: Boolean) {
