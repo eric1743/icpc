@@ -1,80 +1,82 @@
 package icpc.finals.f2019
 
-import java.io.BufferedReader
-import java.io.File
-import java.io.InputStreamReader
+import java.io.*
 import java.util.*
 
 fun main() {
-    val br = File("/Users/z00327d/src/tools/icpc/src/A-azulejos/secret-05.in").bufferedReader()
-//    val br = BufferedReader(InputStreamReader(System.`in`))
+    val br = BufferedReader(InputStreamReader(System.`in`))
     val n = br.readLine().toInt()
-    val bpArr = br.readLine().split(" ").map { it.toInt() }
-    val bhArr = br.readLine().split(" ").map { it.toInt() }
-    val fpArr = br.readLine().split(" ").map { it.toInt() }
-    val fhArr = br.readLine().split(" ").map { it.toInt() }
 
-    val backTree: SortedMap<Int, TreeSet<Tile>> = sortedMapOf()
-    val frntTree: SortedMap<Int, TreeSet<Tile>> = sortedMapOf()
+    val backTree = Tree(br, n, false)
+    val frntTree = Tree(br, n, true)
 
-    for (i in 0 until n) {
-        backTree.getOrPut(bpArr[i]) { sortedSetOf() }
-                .add(Tile(i + 1, bpArr[i], bhArr[i]))
-        frntTree.getOrPut(fpArr[i]) { sortedSetOf(reverseOrder()) }
-                .add(Tile(i + 1, fpArr[i], fhArr[i]))
-    }
+    val bOut = BufferedWriter(OutputStreamWriter(System.out), 4000000)
+    val fOut = BufferedWriter(OutputStreamWriter(System.out), 4000000)
+    repeat(n) {
 
-    var bPricePoint = backTree.pop()
-    var fPricePoint = frntTree.pop()
-    val bOut = mutableListOf<Int>()
-    val fOut = mutableListOf<Int>()
-    for (i in 0 until n) {
-        if (bPricePoint.isEmpty()) {
-            bPricePoint = backTree.pop()
-        }
-        if (fPricePoint.isEmpty()) {
-            fPricePoint = frntTree.pop()
-        }
-        var bTile: Tile?
-        var fTile: Tile?
-        if (bPricePoint.size > fPricePoint.size) {
-            bTile = bPricePoint.pollLast()
-            fTile = fPricePoint.pop(bTile)
-        } else {
-            fTile = fPricePoint.pollFirst()
-            bTile = bPricePoint.pop(fTile)
-        }
-        if (bTile == null || fTile == null || fTile.height >= bTile.height) {
+        val (bTile, fTile) = matchTiles(backTree, frntTree)
+
+        if (bTile == null || fTile == null) {
             println("impossible")
             return
         }
-        bOut += bTile.id
-        fOut += fTile.id
+
+        bOut.append("${bTile.id} ")
+        fOut.append("${fTile.id} ")
     }
-    for (idx in bOut) {
-        print("$idx ")
-    }
+
+    bOut.flush()
     println()
-    for (idx in fOut) {
-        print("$idx ")
+    fOut.flush()
+}
+
+fun matchTiles(bTree: Tree, fTree: Tree): Pair<Tile?, Tile?> {
+    if (bTree.checkSize() < fTree.checkSize()) {
+        val tile = bTree.poll()
+        return Pair(tile, fTree.poll(tile))
     }
-    //test
+    val tile = fTree.poll()
+    return Pair(bTree.poll(tile), tile)
 }
 
-private fun SortedMap<Int, TreeSet<Tile>>.pop(): TreeSet<Tile> {
-    return this.remove(this.firstKey())!!
+class Tree(br: BufferedReader, n: Int, isFront: Boolean) {
+    val tree: SortedMap<Int, TreeSet<Tile>> = sortedMapOf()
+    private lateinit var pricePoint: TreeSet<Tile>
+
+    init {
+        val prices = br.readLine().split(" ").map { it.toInt() }
+        val heights = br.readLine().split(" ").map { it.toInt() }
+        repeat(n) {
+            tree.getOrPut(prices[it]) {
+                if (isFront) sortedSetOf(reverseOrder())
+                else sortedSetOf()
+            }
+                    .add(Tile(it + 1, prices[it], heights[it], isFront))
+        }
+        checkSize()
+    }
+
+    fun checkSize(): Int {
+        if (!this::pricePoint.isInitialized || pricePoint.isEmpty()) {
+            pricePoint = tree.remove(tree.firstKey())!!
+        }
+        return pricePoint.size
+    }
+
+    fun poll() = run { pricePoint.pollFirst() }
+
+    fun poll(tile: Tile): Tile? {
+        val newTile = pricePoint.higher(tile)
+        newTile?.let { pricePoint.remove(newTile) } //only removes if newTile isn't null
+        return newTile
+    }
 }
 
-private fun TreeSet<Tile>.pop(tile: Tile): Tile? {
-    val newTile = this.higher(tile)
-    if (newTile != null)
-        this.remove(newTile)
-    return newTile
-}
-
-data class Tile(val id: Int, val price: Int, val height: Int) : Comparable<Tile> {
+data class Tile(val id: Int, val price: Int, val height: Int, val isFront: Boolean) : Comparable<Tile> {
     override fun compareTo(other: Tile): Int {
-        if (height == other.height) return id.compareTo(other.id)
+        if (height == other.height && isFront == other.isFront) {
+            return id.compareTo(other.id)
+        }
         return height.compareTo(other.height)
     }
 }
