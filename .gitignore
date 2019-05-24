@@ -14,3 +14,5 @@ hs_err_pid*
 /.settings/
 /out/
 /env_make
+
+src/A-azulejos/*
